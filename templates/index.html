@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Signal Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-black text-white font-sans flex items-center justify-center min-h-screen">
+
+  <div class="bg-gray-900 rounded-2xl shadow-xl p-6 w-80 text-center space-y-6">
+    <img src="https://cdn-icons-png.flaticon.com/512/4712/4712100.png" class="w-24 mx-auto" alt="Robot" />
+
+    <div>
+      <p class="text-gray-400 text-sm">ASSET</p>
+      <h2 id="asset" class="text-xl font-bold text-cyan-400">EUR/USD</h2>
+    </div>
+
+    <div>
+      <p class="text-gray-400 text-sm">BUTTON</p>
+      <h2 id="signal" class="text-2xl font-bold bg-green-500 rounded-full py-1">UP</h2>
+    </div>
+
+    <div>
+      <p class="text-gray-400 text-sm">TIME</p>
+      <h2 class="text-base font-bold text-yellow-400" id="time">1 MIN</h2>
+    </div>
+
+    <button onclick="getNextSignal()" class="bg-white text-black font-semibold px-4 py-2 rounded-lg shadow hover:bg-gray-200 transition">
+      NEXT SIGNAL
+    </button>
+  </div>
+
+  <script>
+    const socket = io();
+
+    socket.on('new_signal_event', function (data) {
+      document.getElementById('asset').innerText = data.symbol;
+      document.getElementById('signal').innerText = data.signal.toUpperCase();
+      document.getElementById('signal').className = data.signal === 'call'
+        ? 'text-2xl font-bold bg-green-500 rounded-full py-1'
+        : 'text-2xl font-bold bg-red-500 rounded-full py-1';
+      document.getElementById('time').innerText = data.time || '1 MIN';
+    });
+
+    function getNextSignal() {
+      fetch("/get_signal")
+        .then(res => res.json())
+        .then(data => {
+          alert(data.message);
+        });
+    }
+  </script>
+</body>
+</html>
