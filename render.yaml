@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: binomo-signal-bot
+    env: python
+    buildCommand: ""
+    startCommand: "python flask_server.py"
+    envVars:
+      - key: PORT
+        value: 10000
+    plan: free
