@@ -20,7 +20,7 @@ def login():
         password = request.form['password']
         if password == DASHBOARD_PASSWORD:
             session['logged_in'] = True
-            return redirect(url_for('home'))  # or 'dashboard' if you have a dashboard route
+            return redirect(url_for('dashboard'))  # <-- Fixed: redirect to 'dashboard'
         else:
             return render_template('login.html', error="गलत पासवर्ड")
     return render_template('login.html')
