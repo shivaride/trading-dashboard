@@ -2,9 +2,12 @@ import os
 from flask import Flask, render_template, jsonify, request, session, redirect, url_for
 from datetime import datetime
 import requests
+from flask_socketio import SocketIO, emit
 
 app = Flask(__name__)
 app.secret_key = 'mera_secret_key'  # जरूरी होता है session के लिए
+
+socketio = SocketIO(app)
 
 # 🔐 Set your password here
 DASHBOARD_PASSWORD = 'MeraDashboard@2025'
@@ -87,6 +90,20 @@ def send_telegram():
             return jsonify({'status': 'Failed to send message', 'error': response.text}), 500
     return jsonify({'status': 'No message provided'}), 400
 
+@app.route('/api/send_signal', methods=['POST'])
+def send_signal():
+    data = request.get_json()
+    symbol = data.get('symbol', 'EUR/USD')
+    signal = data.get('signal', 'call')
+    time = data.get('time', '1 MIN')
+
+    socketio.emit('new_signal_event', {
+        'symbol': symbol,
+        'signal': signal,
+        'time': time
+    })
+    return jsonify({"status": "Signal sent"}), 200
+
 @app.route('/logout')
 def logout():
     session.pop('logged_in', None)
@@ -94,7 +111,8 @@ def logout():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port, debug=True)
+    # Use 'allow_unsafe_werkzeug=True' for Flask-SocketIO in development with Werkzeug
+    socketio.run(app, host="0.0.0.0", port=port, debug=True, allow_unsafe_werkzeug=True)
 
 
 
