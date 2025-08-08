@@ -1,3 +1,4 @@
+import os
 from flask import Flask, render_template, jsonify, request
 from datetime import datetime
 
@@ -36,5 +37,11 @@ def trade():
 
     return jsonify({"status": "received"}), 200
 
+@app.route('/verify')
+def verify():
+    return jsonify({"message": "App working perfectly on Render!"})
+
 if __name__ == "__main__":
-    app.run(port=5000, debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port, debug=True)
+
